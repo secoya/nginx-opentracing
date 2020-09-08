@@ -1,6 +1,7 @@
 #include "request_tracing.h"
 #include "utility.h"
 
+#include <opentracing/ext/tags.h>
 #include <sstream>
 #include <stdexcept>
 
@@ -63,6 +64,7 @@ static void add_status_tags(const ngx_http_request_t *request,
   // Treat any 5xx code as an error.
   if (status >= 500) {
     span.SetTag("error", true);
+    span.SetTag(opentracing::ext::sampling_priority, 1);
     span.Log({{"event", "error"}, {"message", status_line}});
   }
 }
